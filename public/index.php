@@ -1,30 +1,34 @@
 <?php
-if (PHP_SAPI == 'cli-server') {
-    // To help the built-in PHP dev server, check if the request was actually for
-    // something which should probably be served as a static file
-    $url  = parse_url($_SERVER['REQUEST_URI']);
-    $file = __DIR__ . $url['path'];
-    if (is_file($file)) {
-        return false;
-    }
-}
+use \Psr\Http\Message\ServerRequestInterface as Request;
+use \Psr\Http\Message\ResponseInterface as Response;
+use \GuzzleHttp\Client as Client;
 
-require __DIR__ . '/../vendor/autoload.php';
+require '../vendor/autoload.php';
 
-session_start();
-
-// Instantiate the app
 $settings = require __DIR__ . '/../src/settings.php';
 $app = new \Slim\App($settings);
+$container = $app->getContainer();
+$container['view'] = new \Slim\Views\PhpRenderer('../templates/');
 
-// Set up dependencies
-require __DIR__ . '/../src/dependencies.php';
+$app->get('/', function (Request $request, Response $response) {
+    $response = $this->view->render($response, 'index.phtml', ['name' => 'GET']);
+    return $response;
+});
 
-// Register middleware
-require __DIR__ . '/../src/middleware.php';
+$app->post('/send', function (Request $aa, Response $response)  {
+    $client = new Client();
+    $movieData = $client->request('GET', 'https://tv-v2.api-fetch.website/random/movie')->getBody();
+    $synopsis = json_decode($movieData)->synopsis;                     
 
-// Register routes
-require __DIR__ . '/../src/routes.php';
 
-// Run app
+    echo PHP_EOL;
+    // echo $response->getBody();
+    // echo $response->getHeader('Content-Length');
+
+
+    // $response = $this->view->render($response, 'index.phtml', ['name' => 'POST']);
+    // return $response;
+    echo 'he';
+});
+
 $app->run();
