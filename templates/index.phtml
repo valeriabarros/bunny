@@ -27,12 +27,13 @@
     </head>
     <body>
         <h1>Voice Bunny</h1>
-        <div>a microframework for PHP</div>
-
+        <div>integrated with popcorn API</div>
         <form action="send" method="POST">
-            <input type="submit" value="Get a random synopse" >
+        <input type="submit" value="<?php if (isset($error)) : ?> Try Again! <?php else : ?> Get a random synopse! <?php endif; ?> ">
         </form>
-            <h2>Hello <?= htmlspecialchars($name); ?>!</h2>
-            <p>Try <a href="http://www.slimframework.com">SlimFramework</a></p>
+            <h2><?= htmlspecialchars($text); ?></h2>
+            <?php if (isset($error)) : ?>
+                <h2 style="color:red;">Damn! <?= htmlspecialchars($error); ?></h2>
+            <?php endif; ?>
     </body>
 </html>
